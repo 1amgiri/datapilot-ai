@@ -11,7 +11,7 @@ DataPilot AI is a workflow-driven multi-agent platform designed for the **Micros
 ```
 datapilot-ai/
 │
-├── backend/            # Spring Boot 3.4.3 + Spring AI + PostgreSQL (Java 21)
+├── backend/            # Spring Boot 3.4.3 + Spring AI + MySQL (Java 21)
 │   ├── src/
 │   ├── pom.xml
 │   ├── Dockerfile

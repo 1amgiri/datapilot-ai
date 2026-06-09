@@ -1,17 +1,17 @@
--- DataPilot AI Database Schema DDL for PostgreSQL
+-- DataPilot AI Database Schema DDL for MySQL
 -- Created for Microsoft Agents League Hackathon Project MVP
 
--- Drop tables if they exist (clean setup)
-DROP TABLE IF EXISTS chat_history CASCADE;
-DROP TABLE IF EXISTS generated_pipeline CASCADE;
-DROP TABLE IF EXISTS generated_sql CASCADE;
-DROP TABLE IF EXISTS generated_schema CASCADE;
-DROP TABLE IF EXISTS analysis_history CASCADE;
-DROP TABLE IF EXISTS project CASCADE;
+-- Drop tables if they exist (clean setup, drops child tables first to avoid FK constraints issues)
+DROP TABLE IF EXISTS chat_history;
+DROP TABLE IF EXISTS generated_pipeline;
+DROP TABLE IF EXISTS generated_sql;
+DROP TABLE IF EXISTS generated_schema;
+DROP TABLE IF EXISTS analysis_history;
+DROP TABLE IF EXISTS project;
 
 -- 1. Project Table
 CREATE TABLE project (
-    id BIGSERIAL PRIMARY KEY,
+    id BIGINT AUTO_INCREMENT PRIMARY KEY,
     name VARCHAR(255) NOT NULL,
     description VARCHAR(1000),
     requirements TEXT,
@@ -20,7 +20,7 @@ CREATE TABLE project (
 
 -- 2. Analysis History Table
 CREATE TABLE analysis_history (
-    id BIGSERIAL PRIMARY KEY,
+    id BIGINT AUTO_INCREMENT PRIMARY KEY,
     project_id BIGINT NOT NULL,
     business_goals_json TEXT,
     entities_json TEXT,
@@ -33,7 +33,7 @@ CREATE TABLE analysis_history (
 
 -- 3. Generated Schema Table
 CREATE TABLE generated_schema (
-    id BIGSERIAL PRIMARY KEY,
+    id BIGINT AUTO_INCREMENT PRIMARY KEY,
     project_id BIGINT NOT NULL,
     tables_json TEXT,
     relationships_json TEXT,
@@ -44,7 +44,7 @@ CREATE TABLE generated_schema (
 
 -- 4. Generated SQL Table
 CREATE TABLE generated_sql (
-    id BIGSERIAL PRIMARY KEY,
+    id BIGINT AUTO_INCREMENT PRIMARY KEY,
     project_id BIGINT NOT NULL,
     queries_json TEXT,
     analytics_queries_json TEXT,
@@ -55,7 +55,7 @@ CREATE TABLE generated_sql (
 
 -- 5. Generated Pipeline Table
 CREATE TABLE generated_pipeline (
-    id BIGSERIAL PRIMARY KEY,
+    id BIGINT AUTO_INCREMENT PRIMARY KEY,
     project_id BIGINT NOT NULL,
     etl_steps_json TEXT,
     data_warehouse_design_json TEXT,
@@ -67,7 +67,7 @@ CREATE TABLE generated_pipeline (
 
 -- 6. Chat History Table
 CREATE TABLE chat_history (
-    id BIGSERIAL PRIMARY KEY,
+    id BIGINT AUTO_INCREMENT PRIMARY KEY,
     project_id BIGINT,
     question TEXT NOT NULL,
     answer TEXT NOT NULL,

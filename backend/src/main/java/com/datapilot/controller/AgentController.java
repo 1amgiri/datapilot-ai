@@ -86,7 +86,7 @@ public class AgentController {
     }
 
     @PostMapping("/full-analysis")
-    @Operation(summary = "Full Orchestration Workflow", description = "Runs all 4 agents sequentially (Analyst -> Architect -> SQL -> Pipeline), persists data in PostgreSQL and aggregates outputs.")
+    @Operation(summary = "Full Orchestration Workflow", description = "Runs all 4 agents sequentially (Analyst -> Architect -> SQL -> Pipeline), persists data in MySQL and aggregates outputs.")
     @ApiResponse(responseCode = "200", description = "Full analysis executed and aggregated successfully",
             content = @Content(schema = @Schema(implementation = FullAnalysisResponse.class)))
     public ResponseEntity<FullAnalysisResponse> fullAnalysis(@Valid @RequestBody AnalysisRequest request) {

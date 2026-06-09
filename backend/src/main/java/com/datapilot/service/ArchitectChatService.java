@@ -83,16 +83,16 @@ public class ArchitectChatService {
         String decisionText;
         String reasoningText;
 
-        if (qLower.contains("postgresql") || qLower.contains("postgres")) {
-            answer = "PostgreSQL is recommended because the workload requires transactional consistency (ACID properties), complex relational table joins (such as joining dimension tables to fact logs), and sub-query indexing options. It serves as an optimal source for Fabric's Medallion staging.";
-            decisionText = "PostgreSQL selected for core relational store.";
+        if (qLower.contains("mysql")) {
+            answer = "MySQL is recommended because the workload requires transactional consistency (ACID properties), complex relational table joins (such as joining dimension tables to fact logs), and sub-query indexing options. It serves as an optimal source for Fabric's Medallion staging.";
+            decisionText = "MySQL selected for core relational store.";
             reasoningText = "Matches the transactional reliability required for analytical query sources.";
         } else if (qLower.contains("mongodb") || qLower.contains("nosql")) {
             answer = "MongoDB is an alternative, but it is not recommended for this specific workload. Since the business goals require structured aggregations, multi-table joins, and cohort analysis (which heavily rely on relational algebra), a structured SQL database prevents application-level sorting overhead.";
             decisionText = "Relational SQL selected over Document NoSQL.";
             reasoningText = "Avoids complex denormalization updates and custom JavaScript map-reduce functions in MongoDB.";
         } else if (qLower.contains("scale") || qLower.contains("performance")) {
-            answer = "The architecture scales in two layers: 1. PostgreSQL transactional indexing handles operational writes. 2. Analytical workloads are offloaded to Microsoft Fabric Lakehouse (Delta Parquet in OneLake) which separates compute from storage, allowing parallel serverless querying of millions of rows.";
+            answer = "The architecture scales in two layers: 1. MySQL transactional indexing handles operational writes. 2. Analytical workloads are offloaded to Microsoft Fabric Lakehouse (Delta Parquet in OneLake) which separates compute from storage, allowing parallel serverless querying of millions of rows.";
             decisionText = "Hybrid transactional-analytical staging.";
             reasoningText = "Separates volatile operational queries from analytical query scans.";
         } else {

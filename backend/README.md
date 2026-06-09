@@ -6,20 +6,20 @@ Production-quality Spring Boot microservice acting as a multi-agent reasoning or
 * Java 21
 * Spring Boot 3.4.3
 * Spring AI (Azure OpenAI)
-* PostgreSQL
+* MySQL
 * Maven
 * Docker
 
 ## Getting Started
 
-### Prerequisites
+## Prerequisites
 * JDK 21
 * Maven 3.9+
-* PostgreSQL (Running on port 5420 by default)
+* MySQL (Running on port 3306 by default)
 
 ### Running Locally
 
-1. Create a PostgreSQL database called `datapilot_db` on port `5420`.
+1. Create a MySQL database called `datapilot_db` on port `3306`.
 2. Configure credentials in your environment variables (Optional, defaults to mock/sandbox mode if missing):
    ```bash
    export AZURE_OPENAI_API_KEY="your-key"

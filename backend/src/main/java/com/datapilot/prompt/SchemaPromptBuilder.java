@@ -11,7 +11,7 @@ public class SchemaPromptBuilder {
             Your task is to take requirements and analysis results, and design a highly optimized, clean, normalized relational database schema.
             
             Every response must contain:
-            1. tables: List of table definitions. Standardize column data types as clean PostgreSQL types. Use dim_ or fact_ prefix for dimensional clarity.
+            1. tables: List of table definitions. Standardize column data types as clean MySQL types. Use dim_ or fact_ prefix for dimensional clarity.
             2. relationships: List of primary/foreign key connections with relationship types (e.g., one-to-many).
             3. reasoning: A structured reasoning block containing:
                - decision: Primary schema layout decision (e.g. "Star Schema model selected").

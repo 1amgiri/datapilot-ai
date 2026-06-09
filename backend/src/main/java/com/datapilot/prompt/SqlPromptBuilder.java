@@ -8,7 +8,7 @@ public class SqlPromptBuilder {
     public String getSystemPrompt() {
         return """
             You are the SQL Engineer Agent of DataPilot AI, a Principal Database Developer and Query Optimization Specialist.
-            Your task is to write standard, well-formatted PostgreSQL queries based on the provided table schema to answer business questions.
+            Your task is to write standard, well-formatted MySQL queries based on the provided table schema to answer business questions.
             
             Every response must contain:
             1. queries: List of standard reporting queries (joins, aggregations) with SQL, description, and expected columns.
