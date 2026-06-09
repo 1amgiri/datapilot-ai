@@ -16,6 +16,28 @@ const __dirname = path.dirname(__filename);
 const app = express();
 app.use(express.json());
 
+const JAVA_BACKEND_URL = 'http://localhost:8080/api/v1';
+
+async function tryProxyToJava(endpoint: string, method: string, body?: any): Promise<any> {
+  try {
+    const options: any = {
+      method,
+      headers: { 'Content-Type': 'application/json' },
+    };
+    if (body) {
+      options.body = JSON.stringify(body);
+    }
+    const res = await fetch(`${JAVA_BACKEND_URL}${endpoint}`, options);
+    if (res.ok) {
+      return await res.json();
+    }
+    console.log(`[Proxy Gateway] Java backend returned status ${res.status} for ${endpoint}`);
+  } catch (err: any) {
+    // Java backend is offline or unreachable - fail silently and fallback to local sandbox/Gemini
+  }
+  return null;
+}
+
 const PORT = 3000;
 const DB_DIR = path.join(process.cwd(), 'data');
 const DB_FILE = path.join(DB_DIR, 'db.json');
@@ -602,6 +624,12 @@ app.post('/api/analyze', async (req, res) => {
     return res.status(400).json({ error: "Requirements text cannot be empty." });
   }
 
+  const javaRes = await tryProxyToJava('/analyze', 'POST', req.body);
+  if (javaRes) {
+    console.log(`[Proxy Gateway] Successfully proxied '/api/analyze' to Spring Boot Java backend.`);
+    return res.json(javaRes);
+  }
+
   console.log(`[Agent: Analyst] Analyzing requirements for user request..`);
 
   // Prompt logic
@@ -658,6 +686,12 @@ app.post('/api/schema', async (req, res) => {
   const { requirements, analysis } = req.body;
   if (!requirements) {
     return res.status(400).json({ error: "Must provide original requirements." });
+  }
+
+  const javaRes = await tryProxyToJava('/schema', 'POST', req.body);
+  if (javaRes) {
+    console.log(`[Proxy Gateway] Successfully proxied '/api/schema' to Spring Boot Java backend.`);
+    return res.json(javaRes);
   }
 
   console.log(`[Agent: Architect] Preparing schema tables based on analysis.`);
@@ -718,6 +752,12 @@ app.post('/api/sql', async (req, res) => {
     return res.status(400).json({ error: "Must provide schema input." });
   }
 
+  const javaRes = await tryProxyToJava('/sql', 'POST', req.body);
+  if (javaRes) {
+    console.log(`[Proxy Gateway] Successfully proxied '/api/sql' to Spring Boot Java backend.`);
+    return res.json(javaRes);
+  }
+
   console.log(`[Agent: SQL] Drafting reports and analytical queries.`);
 
   const systemPrompt = `You are the SQL Engineer Agent of DataPilot AI, a Principal Database Developer and Query Optimization Specialist.
@@ -767,6 +807,12 @@ app.post('/api/pipeline', async (req, res) => {
   const { requirements, schema, analysis } = req.body;
   if (!schema) {
     return res.status(400).json({ error: "Must provide database schema structure." });
+  }
+
+  const javaRes = await tryProxyToJava('/pipeline', 'POST', req.body);
+  if (javaRes) {
+    console.log(`[Proxy Gateway] Successfully proxied '/api/pipeline' to Spring Boot Java backend.`);
+    return res.json(javaRes);
   }
 
   console.log(`[Agent: Pipeline] Designing fabric pipelines & Lakehouse layout.`);
@@ -829,6 +875,29 @@ app.post('/api/full-analysis', async (req, res) => {
   const { name, requirements } = req.body;
   if (!name || !requirements) {
     return res.status(400).json({ error: "Project name and requirements are required." });
+  }
+
+  const javaRes = await tryProxyToJava('/full-analysis', 'POST', { requirements });
+  if (javaRes) {
+    console.log(`[Proxy Gateway] Successfully proxied '/api/full-analysis' to Spring Boot Java backend.`);
+    const advanced = generateAdvancedReasoning(name, requirements, javaRes.analysis, javaRes.schema, javaRes.sql, javaRes.pipeline);
+    const mappedProject = {
+      id: "proj_" + javaRes.projectId,
+      name: name,
+      description: requirements.length > 120 ? requirements.substring(0, 117) + "..." : requirements,
+      requirements: requirements,
+      createdAt: new Date().toISOString(),
+      status: "completed",
+      analysis: javaRes.analysis,
+      schema: javaRes.schema,
+      sql: javaRes.sql,
+      pipeline: javaRes.pipeline,
+      ...advanced
+    };
+    const db = loadDb();
+    db.push(mappedProject);
+    saveDb(db);
+    return res.json(mappedProject);
   }
 
   console.log(`[Multi-Agent Pipeline] Executing sequential reasoning process for: "${name}"`);
@@ -1524,6 +1593,27 @@ app.post('/api/chat', async (req, res) => {
   
   // Find or default the active project
   const project = db.find((p: any) => p.id === projectId) || db[0];
+
+  // Try proxying to Java backend
+  const javaRes = await tryProxyToJava('/chat', 'POST', {
+    question: message,
+    projectId: projectId ? parseInt(projectId.replace('proj_', '')) : null,
+    contextJson: JSON.stringify(project)
+  });
+
+  if (javaRes) {
+    console.log(`[Proxy Gateway] Successfully proxied '/api/chat' to Spring Boot Java backend.`);
+    return res.json({
+      decisionSummary: javaRes.reasoning?.decision || "Java Backend Response",
+      reasoning: javaRes.reasoning?.reasoning || "",
+      assumptions: javaRes.reasoning?.assumptions || [],
+      tradeoffs: ["Spring Boot MVC integration", "PostgreSQL database audit state"],
+      alternatives: javaRes.reasoning?.alternatives || [],
+      confidenceScore: javaRes.reasoning?.confidenceScore || 90,
+      mainExplanation: javaRes.answer,
+      extraMetadata: { type: "standard_chat" }
+    });
+  }
   
   const projectName = project ? project.name : "DataPilot Custom Application";
   const projectRequirements = project ? project.requirements : "Custom relational requirements";
