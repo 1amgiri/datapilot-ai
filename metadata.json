@@ -1,0 +1,8 @@
+{
+  "name": "DataPilot AI",
+  "description": "An intelligent multi-agent AI copilot that transforms business requirements into data architectures, normalized SQL solutions, and Microsoft Fabric pipelines.",
+  "requestFramePermissions": [],
+  "majorCapabilities": [
+    "MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"
+  ]
+}
